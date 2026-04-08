@@ -14,43 +14,42 @@ client = OpenAI()
 
 
 def main():
-    print(f"[START] model={MODEL_NAME}")
+    print(f"[START] task=github-triage env=github_triage_env model={MODEL_NAME}")
 
-    # Reset environment
-    res = requests.post(f"{API_BASE_URL}/reset")
-    data = res.json()
+    try:
+        reset = requests.post(f"{API_BASE_URL}/reset")
+        data = reset.json()
 
-    observation = data["observation"]
+        observation = data["observation"]
 
-    issue_title = observation["issue_title"]
-    issue_body = observation["issue_body"]
-
-    # Simple baseline policy
-    action = {
-        "action": {
-            "label": "bug",
-            "priority": "high",
-            "decision": "assign_label"
+        action = {
+            "action": {
+                "label": "bug",
+                "priority": "high",
+                "decision": "assign_label"
+            }
         }
-    }
 
-    res = requests.post(
-        f"{API_BASE_URL}/step",
-        json=action
-    )
+        step = requests.post(
+            f"{API_BASE_URL}/step",
+            json=action
+        )
 
-    result = res.json()
+        result = step.json()
 
-    reward = result["reward"]
-    done = result["done"]
+        reward = result.get("reward", 0)
+        done = result.get("done", False)
 
-    print(
-        f"[STEP] action={action} reward={reward:.2f} done={done} error=null"
-    )
+        print(
+            f"[STEP] step=1 action={action['action']} reward={reward:.2f} done={done} error=null"
+        )
 
-    print(
-        f"[END] success={done} score={reward:.2f}"
-    )
+        print(
+            f"[END] success={done} steps=1 score={reward:.2f} rewards={reward:.2f}"
+        )
+
+    except Exception as e:
+        print(f"[END] success=false steps=0 score=0 error={str(e)}")
 
 
 if __name__ == "__main__":
