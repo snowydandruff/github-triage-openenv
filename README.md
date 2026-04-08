@@ -1,7 +1,3 @@
-Here is the full README ready to copy-paste. Just paste this into your README.md on GitHub.
-
-:::writing{variant=“standard” id=“73421”}
-
 GitHub Triage OpenEnv Environment
 
 This project implements a GitHub Issue Triage environment using the OpenEnv framework.
