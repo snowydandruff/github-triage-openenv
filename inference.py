@@ -2,17 +2,17 @@ import os
 import requests
 from openai import OpenAI
 
-API_BASE_URL = os.getenv("API_BASE_URL")
+# REQUIRED ENV VARIABLES (must use os.environ exactly)
+API_BASE_URL = os.environ["API_BASE_URL"]
+API_KEY = os.environ["API_KEY"]
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
-API_KEY = os.getenv("API_KEY")
 
-# Initialize OpenAI using the proxy they inject
+# Initialize OpenAI with the proxy
 client = OpenAI(
-    api_key=API_KEY,
-    base_url=API_BASE_URL
+    base_url=API_BASE_URL,
+    api_key=API_KEY
 )
 
-# Environment URL (your HuggingFace env)
 ENV_URL = "https://snowydandruff-github-triage-openenv.hf.space"
 
 
@@ -30,18 +30,12 @@ def main():
         response = client.chat.completions.create(
             model=MODEL_NAME,
             messages=[
-                {
-                    "role": "system",
-                    "content": "You are a GitHub issue triage assistant."
-                },
-                {
-                    "role": "user",
-                    "content": f"Classify this GitHub issue and choose label, priority, and decision:\n\n{issue_text}"
-                }
+                {"role": "system", "content": "You classify GitHub issues."},
+                {"role": "user", "content": issue_text}
             ]
         )
 
-        # simple baseline action
+        # Simple baseline action
         action = {
             "action": {
                 "label": "bug",
